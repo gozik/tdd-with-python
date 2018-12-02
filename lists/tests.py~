@@ -6,6 +6,6 @@ class HomePageTest(TestCase):
     '''test of home page'''
 
     def test_root_url_resolves_to_home_page_view(self):
-        '''test: root url shows home page'''
+        '''test: root url refer home page'''
         found = resolve('/')
         self.assertEqual(found.func, home_page)
