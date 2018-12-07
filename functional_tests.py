@@ -18,17 +18,35 @@ class NewVisitorTest(unittest.TestCase):
 
         #He sees title and header sing about to-do lists
         self.assertIn('To-Do', self.browser.title)
+        header_text = self.browser.find_element_by_tag_name('h1').text
+        self.assertIn('To-Do', header_text)
 
-        self.fail('End of test')
         #He is invited to create a list item
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        self.assertEqual(
+                inputbox.get_attribute('placeholder'),
+                'Enter a to-do item'
+        )
 
 
-        #He types 'Make a call with mother' as first to-do item
 
+        #He types 'call mother' as first to-do item
+        inputbox.send_keys('Call mother')
+
+        #When he presses enter page refreshes, now page contains "1. Call mother" as list item.
+        inputbox.send_keys(Keys.ENTER)
+        time.sleep(1)
+
+        table = self.browser.find_element_by_id('id_list_table')
+        rows = table.find_elements_by_tag_name('tr')
+        self.assertTrue(
+                any(row.text == '1: Call mother' for row in rows)
+        )
 
         #Text field still asks to make another item
         #He enters 'Say granny I love her'
 
+        self.fail('To finish test')
 
         #Page reloads and now it displays both items
 
