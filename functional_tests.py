@@ -13,6 +13,12 @@ class NewVisitorTest(unittest.TestCase):
         '''Shutting down'''
         self.browser.quit()
 
+    def check_for_row_in_list_table(self, row_text):
+        table = self.browser.find_element_by_id('id_list_table')
+        rows = table.find_elements_by_tag_name('tr')
+        self.assertIn(row_text, [row.text for row in rows])
+ 
+
     def test_can_start_a_list_and_retrieve_it_later(self):
         '''test: it is possible to create a list and work with it later'''
         #Greg is aware about cool to-do list on internet. He decides to check its home page.
@@ -39,9 +45,7 @@ class NewVisitorTest(unittest.TestCase):
         inputbox.send_keys(Keys.ENTER)
         time.sleep(1)
 
-        table = self.browser.find_element_by_id('id_list_table')
-        rows = table.find_elements_by_tag_name('tr')
-        self.assertIn('1: Call mother', [row.text for row in rows])
+        self.check_for_row_in_list_table('1: Call mother')
 
         #Text field still asks to make another item
         #He enters 'Say granny I love her'
@@ -52,10 +56,8 @@ class NewVisitorTest(unittest.TestCase):
 
 
         #Page reloads and now it displays both items
-        table = self.browser.find_element_by_id('id_list_table')
-        rows = table.find_elements_by_tag_name('tr')
-        self.assertIn('1: Call mother', [row.text for row in rows])
-        self.assertIn('2: Say granny I love her', [row.text for row in rows])
+        self.check_for_row_in_list_table('1: Call mother')
+        self.check_for_row_in_list_table('2: Say granny I love her')
 
 
         #Greg wonders if site remembers his list. He sees that site generates unique URL for him.
