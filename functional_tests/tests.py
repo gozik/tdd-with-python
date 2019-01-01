@@ -33,7 +33,7 @@ class NewVisitorTest(LiveServerTestCase):
         '''Shutting down'''
         self.browser.quit()
 
-    def test_can_start_a_list_and_retrieve_it_later(self):
+    def test_can_start_a_list_for_one_user(self):
         '''test: it is possible to create a list and work with it later'''
         #Greg is aware about cool to-do list on internet. He decides to check its home page.
         self.browser.get(self.live_server_url)
@@ -70,13 +70,47 @@ class NewVisitorTest(LiveServerTestCase):
         self.wait_for_row_in_list_table('1: Call mother')
         self.wait_for_row_in_list_table('2: Say granny I love her')
 
-        #Greg wonders if site remembers his list. He sees that site generates unique URL for him.
-        #There is some text with explanation.
-
-        self.fail('To finish test')
-
-        #He visits this URL - his list is still there.
 
 
+    def test_multiple_users_can_start_lists_at_different_urls(self):
+        """ test: multiple users can start lists at different urls """
+        # Greg starts new list
+        self.browser.get(self.live_server_url)
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        inputbox.send_keys('Call mother')
+        inputbox.send_keys(Keys.ENTER)
+        self.wait_for_row_in_list_table('1: Call mother')
 
-        #Greg is happy, he goes to bed.
+        # He notices, that his list has unique url.
+        greg_list_url = self.browser.current_url
+        self.assertRegex(greg_list_url, '/lists/.+')
+
+        # New user, Sue appears on site.
+        
+        ## Using new browser instance to hide any Greg session information from Sue.
+        self.browser.quit()
+        self.browser = webdriver.Firefox()
+
+        # Sue visits home page. There is no track of Greg's activity
+        self.browser.get(self.live_server_url)
+        page_text = self.browser.find_element_by_tag_name('body').text
+        self.assertNotIt('Call mother', page_text)
+        self.assertNotIn('Say granny I love her')
+
+        # Sue starts new list. She gonna to grossery.
+        inputbox = self.browser.find_elment_by_id('id_new_item')
+        inputbox.send_keys('Buy milk')
+        inputbox.send_keys(Keys.ENTER)
+        self.wait_for_row_in_list_table('1: Buy milk')
+
+        # Sue gets unique url.
+        sue_list_url = self.browser.current_url
+        self.assertRegex(sue_list_url, '/lists/.+')
+        self.assertNotEqual(greg_list_url, sue_list_url)
+
+        # Still there is no track of Greg's list on page.
+        page_text = self.browser.find_element_by_tag_name('body').text
+        self.assertNotIn('1: Call mother', page_text)
+        self.assertIN('1: Buy milk', page_text)
+
+        # Sue and Greg go sleep.
