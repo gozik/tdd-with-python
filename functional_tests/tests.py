@@ -94,7 +94,7 @@ class NewVisitorTest(LiveServerTestCase):
         # Sue visits home page. There is no track of Greg's activity
         self.browser.get(self.live_server_url)
         page_text = self.browser.find_element_by_tag_name('body').text
-        self.assertNotIt('Call mother', page_text)
+        self.assertNotIn('Call mother', page_text)
         self.assertNotIn('Say granny I love her')
 
         # Sue starts new list. She gonna to grossery.
@@ -111,6 +111,6 @@ class NewVisitorTest(LiveServerTestCase):
         # Still there is no track of Greg's list on page.
         page_text = self.browser.find_element_by_tag_name('body').text
         self.assertNotIn('1: Call mother', page_text)
-        self.assertIN('1: Buy milk', page_text)
+        self.assertIn('1: Buy milk', page_text)
 
         # Sue and Greg go sleep.

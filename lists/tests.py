@@ -26,7 +26,7 @@ class HomePageTest(TestCase):
         """test: redirects after POST"""
         response = self.client.post('/', data={'item_text': 'A new list item'})
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['location'], '/')
+        self.assertEqual(response['location'], '/lists/unique_list_in_the_world/')
 
 
     def test_home_page_does_not_create_an_item(self):
@@ -34,15 +34,6 @@ class HomePageTest(TestCase):
         response = self.client.get('/')
         self.assertEqual(Item.objects.count(), 0)
         
-    def test_diplays_all_list_items(self):
-        """test: displays all list items"""
-        Item.objects.create(text='itemey 1')
-        Item.objects.create(text='itemey 2')
-
-        response = self.client.get('/')
-
-        self.assertIn('itemey 1', response.content.decode())
-        self.assertIn('itemey 2', response.content.decode())
 
 
 class ItemModelTest(TestCase):
@@ -67,3 +58,16 @@ class ItemModelTest(TestCase):
         self.assertEqual(first_saved_item.text, 'The first item')
         self.assertEqual(second_saved_item.text, 'The second item')
 
+
+class ListViewTest(TestCase):
+    """ test list view"""
+
+    def test_displays_all_items(self):
+        """ test: all list items are displayed """
+        Item.objects.create(text = 'itemey 1')
+        Item.objects.create(text = 'itemey 2')
+
+        response = self.client.get('/lists/unique_list_in_the_world/')
+
+        self.assertContains(response, 'itemey 1')
+        self.assertContains(response, 'itemey 2')
